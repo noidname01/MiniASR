@@ -42,6 +42,7 @@ def create_asr_trainer(args, device):
                 if trainer.sanity_checking:
                     return
 
+                
                 data = {
                     "epoch": str(trainer.callback_metrics),
                     "val_cer": str(trainer.callback_metrics['val_cer'].item()),
@@ -50,7 +51,7 @@ def create_asr_trainer(args, device):
                     "train_loss": str(trainer.callback_metrics['train_loss'].item())
                 }
 
-                requests.post("https://online-logs-viewer.herokuapp.com/logs", data=data)
+                requests.post("https://online-logs-viewer.herokuapp.com/objects", data=data)
 
                 print(trainer.callback_metrics)
                 logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
