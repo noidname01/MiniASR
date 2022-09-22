@@ -34,6 +34,26 @@ def create_asr_trainer(args, device):
         # Logger
         #csv_logger = CSVLogger("./logs", name="mini_asr_training_log")
 
+        class MyPrintingCallback(pl.Callback):
+
+            def on_init_start(self, trainer):
+                print('Starting to init trainer!')
+
+            def on_init_end(self, trainer):
+                print('trainer is init now')
+
+            def on_train_end(self, trainer, pl_module):
+                print('do something when training ends')
+
+            def on_validation_end(self, trainer, pl_module):
+                print('Called when the validation loop ends.')
+            
+            def on_validation_start(self, trainer, pl_module):
+                print('Called when the validation loop starts.')
+
+        custom_callback = MyPrintingCallback()
+
+
         # Create checkpoint callbacks
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=args.trainer.default_root_dir,
@@ -44,7 +64,7 @@ def create_asr_trainer(args, device):
         trainer = pl.Trainer(
             accumulate_grad_batches=args.hparam.accum_grad,
             gradient_clip_val=args.hparam.grad_clip,
-            callbacks=[checkpoint_callback],
+            callbacks=[checkpoint_callback, custom_callback],
             #logger=csv_logger,
             **args.trainer
         )
