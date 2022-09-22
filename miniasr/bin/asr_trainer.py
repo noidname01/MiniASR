@@ -41,10 +41,10 @@ def create_asr_trainer(args, device):
                 if trainer.sanity_checking:
                     return
 
-                logging.info("VAL_CER: " + trainer.callback_metrics['val_cer'].item())
-                logging.info("VAL_WER: " + trainer.callback_metrics['val_wer'].item())
-                logging.info("VAL_LOSS: " + trainer.callback_metrics['val_loss'].item())
-                logging.info("TRAIN_LOSS: " + trainer.callback_metrics['train_loss'].item())
+                logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
+                logging.info("VAL_WER: " + str(trainer.callback_metrics['val_wer'].item()))
+                logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))
+                logging.info("TRAIN_LOSS: " + str(trainer.callback_metrics['train_loss'].item()))
 
                 logging.info('\n\nValidation loop ends.\n\n')
                 
