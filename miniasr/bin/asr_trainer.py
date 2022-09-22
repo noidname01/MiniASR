@@ -56,8 +56,11 @@ def create_asr_trainer(args, device):
                     "train_loss": str(trainer.callback_metrics['train_loss'].item())
                 }
 
-                req = requests.post("https://online-logs-viewer.herokuapp.com/objects", data=data)
+                req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json={"content": data})
                 print(req)
+                req = requests.post("https://online-logs-viewer.herokuapp.com/logs", json={"content": "epoch" + str(trainer.current_epoch)})
+                print(req)
+                
 
                 logging.info('\n\nValidation loop ends.\n\n')
                 
