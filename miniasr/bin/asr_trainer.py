@@ -41,7 +41,7 @@ def create_asr_trainer(args, device):
             def on_validation_end(self, trainer, pl_module):
                 if trainer.sanity_checking:
                     return
-                print("epoch: " + trainer.current_epoch)
+                print("epoch: " + str(trainer.current_epoch))
                 logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
                 logging.info("VAL_WER: " + str(trainer.callback_metrics['val_wer'].item()))
                 logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))
@@ -56,8 +56,8 @@ def create_asr_trainer(args, device):
                     "train_loss": str(trainer.callback_metrics['train_loss'].item())
                 }
 
-                requests.post("https://online-logs-viewer.herokuapp.com/objects", data=data)
-
+                req = requests.post("https://online-logs-viewer.herokuapp.com/objects", data=data)
+                print(req)
 
                 logging.info('\n\nValidation loop ends.\n\n')
                 
