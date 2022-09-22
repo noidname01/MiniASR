@@ -41,6 +41,7 @@ def create_asr_trainer(args, device):
                 if trainer.sanity_checking:
                     return
 
+                print(trainer.callback_metrics)
                 logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
                 logging.info("VAL_WER: " + str(trainer.callback_metrics['val_wer'].item()))
                 logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))

@@ -16,3 +16,4 @@ h5py
 lxml
 resemblyzer
 gdown
+requests
