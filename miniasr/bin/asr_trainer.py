@@ -49,7 +49,7 @@ def create_asr_trainer(args, device):
                     "val_loss": str(trainer.callback_metrics['val_loss'].item()),
                     "train_loss": str(trainer.callback_metrics['train_loss'].item())
                 }
-
+                
                 requests.post("https://online-logs-viewer.herokuapp.com/logs", data=data)
 
                 print(trainer.callback_metrics)
