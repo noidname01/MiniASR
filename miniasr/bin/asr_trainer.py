@@ -36,20 +36,19 @@ def create_asr_trainer(args, device):
 
         class MyPrintingCallback(pl.Callback):
 
-            def on_init_start(self, trainer):
-                print('Starting to init trainer!')
-
-            def on_init_end(self, trainer):
-                print('trainer is init now')
-
-            def on_train_end(self, trainer, pl_module):
-                print('do something when training ends')
-
+          
             def on_validation_end(self, trainer, pl_module):
-                print('Called when the validation loop ends.')
+                if trainer.running_sanity_check:
+                    return
+                logging.info('\n\nValidation loop ends.\n\n')
+                logging.info(trainer.callback_metrics)
+                
             
             def on_validation_start(self, trainer, pl_module):
-                print('Called when the validation loop starts.')
+                if trainer.running_sanity_check:
+                    return
+                logging.info('\n\nValidation loop starts.\n\n')
+                
 
         custom_callback = MyPrintingCallback()
 
