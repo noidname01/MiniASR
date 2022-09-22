@@ -6,6 +6,7 @@
 
 import logging
 import pytorch_lightning as pl
+import requests
 #from pytorch_lightning.loggers import CSVLogger
 
 from miniasr.data.dataloader import create_dataloader
@@ -40,6 +41,16 @@ def create_asr_trainer(args, device):
             def on_validation_end(self, trainer, pl_module):
                 if trainer.sanity_checking:
                     return
+
+                data = {
+                    "epoch": str(trainer.callback_metrics),
+                    "val_cer": str(trainer.callback_metrics['val_cer'].item()),
+                    "val_wer": str(trainer.callback_metrics['val_wer'].item()),
+                    "val_loss": str(trainer.callback_metrics['val_loss'].item()),
+                    "train_loss": str(trainer.callback_metrics['train_loss'].item())
+                }
+
+                requests.post("https://online-logs-viewer.herokuapp.com/logs", data=data)
 
                 print(trainer.callback_metrics)
                 logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
