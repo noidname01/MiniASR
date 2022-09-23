@@ -156,6 +156,8 @@ class ASR(BaseASR):
         return self.greedy_decode(logits, enc_len)
 
     def custom_decode(self, logits, enc_len):
+        print("DTYPE")
+        print(logits.dtype)
         logits = logits.cpu().numpy()
         logits = np.delete(logits,2,2)
         logits = np.delete(logits,3,2)
