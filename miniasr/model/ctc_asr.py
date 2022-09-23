@@ -11,6 +11,7 @@ from torch import nn
 
 from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
+from rnnt import RNNTransducer
 
 
 class ASR(BaseASR):
@@ -24,6 +25,8 @@ class ASR(BaseASR):
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:
             self.encoder = RNNEncoder(self.in_dim, **args.model.encoder)
+        elif self.args.model.encoder.module == 'RNN-t':
+           self.transducer = RNNTransducer(num_classes=self.vocab_size)
         else:
             raise NotImplementedError(
                 f'Unkown encoder module {self.args.model.encoder.module}')
@@ -95,7 +98,7 @@ class ASR(BaseASR):
             f'LM weight {self.args.decode.lm_weight}, '
             f'Word score {self.args.decode.word_score}')
 
-    def forward(self, wave, wave_len):
+    def forward(self, wave, wave_len, text, text_len):
         '''
             Forward function to compute logits.
             Input:
@@ -110,14 +113,18 @@ class ASR(BaseASR):
 
         # Extract features
         feat, feat_len = self.extract_features(wave, wave_len)
+        
+        if self.args.model.encoder.module == 'RNN-t':
+            logits = self.transducer(feat, feat_len, text, text_len)
+            return logits, feat_len, feat, feat_len
+        else:
+            # Encode features
+            enc, enc_len = self.encoder(feat, feat_len)
 
-        # Encode features
-        enc, enc_len = self.encoder(feat, feat_len)
+            # Project hidden features to vocabularies
+            logits = self.ctc_output_layer(enc)
 
-        # Project hidden features to vocabularies
-        logits = self.ctc_output_layer(enc)
-
-        return logits, enc_len, feat, feat_len
+            return logits, enc_len, feat, feat_len
 
     def cal_loss(self, logits, enc_len, feat, feat_len, text, text_len):
         ''' Computes CTC loss. '''
