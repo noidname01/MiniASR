@@ -117,7 +117,7 @@ class ASR(BaseASR):
         enc, enc_len = self.encoder(feat, feat_len)
 
         # Project hidden features to vocabularies
-        logits = self.ctc_output_layer(enc)
+        logits, _ = self.ctc_output_layer(enc) # use RNN in this case
 
         return logits, enc_len, feat, feat_len
 
