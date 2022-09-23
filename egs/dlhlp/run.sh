@@ -5,7 +5,7 @@
 stage=3
 stop_stage=3
 model_name=ctc_libri-10h_char
-ckpt=  model/ctc_libri-10h_char/epoch=2-step=257-v1.ckpt
+ckpt=  #model/ctc_libri-10h_char/epoch=2-step=257-v1.ckpt
 
 
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
