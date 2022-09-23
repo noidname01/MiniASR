@@ -13,7 +13,7 @@ from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
 
 # =========================================
-
+import os
 # from glob import glob
 # from string import ascii_lowercase
 # from collections import defaultdict
@@ -31,6 +31,8 @@ class ASR(BaseASR):
 
     def __init__(self, tokenizer, args):
         super().__init__(tokenizer, args)
+
+        print(os.path.abspath('.'))
 
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:

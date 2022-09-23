@@ -7,6 +7,7 @@ data:
 
 decode:
   type: greedy
+  lm_path: data/language_model.p
 
 hparam:
   val_batch_size: 16
