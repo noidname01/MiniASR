@@ -107,6 +107,9 @@ def main():
             create_asr_trainer_test(args, device)
         model.eval()
         trainer.test(model, dv_loader)
+        result = trainer.predict(model, dv_loader)
+        logging.info(result)
+        
     elif args.mode == 'predict':
         # Prediction
         logging.info('Prediction mode.')
