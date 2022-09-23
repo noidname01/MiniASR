@@ -38,6 +38,19 @@ def create_asr_trainer(args, device):
 
         class MyPrintingCallback(pl.Callback):
 
+            def on_epoch_end(self , trainer, pl_module):
+
+                try:
+        
+                    requestBody = {
+                        "content": "Epoch " + str(trainer.current_epoch) + " finished!",
+                        "title": args.title
+                    }
+                    req = requests.post("https://online-logs-viewer.herokuapp.com/logs", json=requestBody)
+                    logging.info(req)
+                except Exception as e:
+                    logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
+                
           
             def on_validation_end(self, trainer, pl_module):
                 if trainer.sanity_checking:
@@ -50,14 +63,14 @@ def create_asr_trainer(args, device):
                 logging.info("TRAIN_LOSS: " + str(trainer.callback_metrics['train_loss'].item()))
 
                 try:
-            
+        
                     requestBody = {
                         "content": {
-                            "epoch": str(trainer.current_epoch),
-                            "val_cer": str(trainer.callback_metrics['val_cer'].item()),
-                            "val_wer": str(trainer.callback_metrics['val_wer'].item()),
-                            "val_loss": str(trainer.callback_metrics['val_loss'].item()),
-                            "train_loss": str(trainer.callback_metrics['train_loss'].item())
+                            "epoch": trainer.current_epoch,
+                            "val_cer": trainer.callback_metrics['val_cer'].item(),
+                            "val_wer": trainer.callback_metrics['val_wer'].item(),
+                            "val_loss": trainer.callback_metrics['val_loss'].item(),
+                            "train_loss": trainer.callback_metrics['train_loss'].item()
                         },
                         "title": args.title
                     }
