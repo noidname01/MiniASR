@@ -147,11 +147,11 @@ class ASR(BaseASR):
 
         return ctc_loss
 
-    def decode(self, logits, enc_len, decode_type=None):
+    def decode(self, logits, enc_len):
         ''' Decoding. '''
-        if self.enable_beam_decode and decode_type != 'greedy':
+        if self.enable_beam_decode and self.args.decode.type != 'greedy':
             return self.beam_decode(logits, enc_len)
-        if decode_type=='custom':
+        if self.args.decode.type=='custom':
             return self.custom_decode(logits, enc_len)
         return self.greedy_decode(logits, enc_len)
 
