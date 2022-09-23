@@ -49,21 +49,24 @@ def create_asr_trainer(args, device):
                 logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))
                 logging.info("TRAIN_LOSS: " + str(trainer.callback_metrics['train_loss'].item()))
 
-                
-                requestBody = {
-                    "content": {
-                        "epoch": str(trainer.current_epoch),
-                        "val_cer": str(trainer.callback_metrics['val_cer'].item()),
-                        "val_wer": str(trainer.callback_metrics['val_wer'].item()),
-                        "val_loss": str(trainer.callback_metrics['val_loss'].item()),
-                        "train_loss": str(trainer.callback_metrics['train_loss'].item())
-                    },
-                    "title": args.title
-                }
-                
+                try:
+            
+                    requestBody = {
+                        "content": {
+                            "epoch": str(trainer.current_epoch),
+                            "val_cer": str(trainer.callback_metrics['val_cer'].item()),
+                            "val_wer": str(trainer.callback_metrics['val_wer'].item()),
+                            "val_loss": str(trainer.callback_metrics['val_loss'].item()),
+                            "train_loss": str(trainer.callback_metrics['train_loss'].item())
+                        },
+                        "title": args.title
+                    }
+                    
 
-                req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json=requestBody)
-                logging.info(req)
+                    req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json=requestBody)
+                    logging.info(req)
+                except Exception as e:
+                    logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
                 
 
                 logging.info('\n\nValidation loop ends.\n\n')
