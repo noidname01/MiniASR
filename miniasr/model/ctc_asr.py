@@ -20,7 +20,7 @@ from miniasr.module import RNNEncoder
 # import pickle
 # import numpy as np
 from miniasr.prefix_beam_search import prefix_beam_search
-from miniasr.language_model import LanguageModel
+from miniasr.prefix_beam_search import language_model
 
 
 
