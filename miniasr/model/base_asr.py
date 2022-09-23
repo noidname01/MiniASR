@@ -166,6 +166,7 @@ class BaseASR(pl.LightningModule):
             print("\n\n\n\nlogits")
             print(logits.shape)
             print(logits)
+            print(enc_len)
             print("\n\n\n\n")
             hyps = self.decode(logits, enc_len)
 
