@@ -1,5 +1,5 @@
 mode: train
-title: rna_asr
+title: change_gru_to_lstm
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -9,7 +9,7 @@ data:
     vocab: data/libri_train_1h/vocab_char.txt
 
 model:
-  name: rna_asr
+  name: ctc_asr
   extractor:
     name: fbank
     train: false
@@ -17,7 +17,7 @@ model:
   encoder:
     hid_dim: 256
     n_layers: 3
-    module: GRU
+    module: LSTM
     bidirectional: true
     dropout: 0.2
   optim:
