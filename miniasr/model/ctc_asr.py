@@ -163,7 +163,7 @@ class ASR(BaseASR):
         logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
         new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
         
-        return [  prefix_beam_search(logits[i], lm=self.language_model) for i in logits.shape[0] ]
+        return [  prefix_beam_search(logits[i], lm=self.language_model) for i in range(logits.shape[0]) ]
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
