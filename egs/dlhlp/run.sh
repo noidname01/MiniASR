@@ -2,8 +2,8 @@
 
 . ./path.sh || exit 1;
 
-stage=4
-stop_stage=4
+stage=5
+stop_stage=5
 model_name=ctc_libri-10h_char
 ckpt=model/ctc_libri-10h_char/origin/epoch=101-step=8771.ckpt
 
@@ -82,6 +82,20 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
         run_asr.py \
             --config config/test.yaml \
             --test \
+            --ckpt $ckpt
+    fi
+fi
+
+if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
+    echo "Stage 5: Predict E2E ASR"
+    mkdir -p model
+
+    if [ -z "$ckpt" ]; then
+        echo "Error: ckpt must be specified during predicting!" || exit 1
+    else
+        run_asr.py \
+            --config config/predict.yaml \
+            --predict \
             --ckpt $ckpt
     fi
 fi
