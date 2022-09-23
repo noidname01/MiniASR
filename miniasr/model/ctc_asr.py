@@ -76,7 +76,7 @@ class ASR(BaseASR):
             self.setup_flashlight()
 
         # Language model
-        self.language_model = LanguageModel('../prefix_beam_search/language_model.p')
+        self.language_model = LanguageModel('prefix_beam_search/language_model.p')
 
     def setup_flashlight(self):
         '''
