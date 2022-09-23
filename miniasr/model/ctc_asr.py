@@ -12,14 +12,14 @@ from torch import nn
 from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
 
+# =========================================
+
 from glob import glob
 from string import ascii_lowercase
 from collections import defaultdict
 import pickle
 import numpy as np
 from miniasr.prefix_beam_search import prefix_beam_search
-
-
 
 
 class LanguageModel(object):
@@ -74,6 +74,9 @@ class ASR(BaseASR):
         if self.args.mode in {'dev', 'test'} and self.args.decode.type == 'beam':
             self.enable_beam_decode = True
             self.setup_flashlight()
+
+        # Language model
+        self.language_model = LanguageModel('../prefix_beam_search/language_model.p')
 
     def setup_flashlight(self):
         '''
@@ -182,7 +185,8 @@ class ASR(BaseASR):
         new_logits = np.copy(logits[:,:,3:])
         logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
         new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
-        pass
+        
+        return [  prefix_beam_search(logits[i], lm=self.language_model) for i in logits.shape[0] ]
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
