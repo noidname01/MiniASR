@@ -40,6 +40,11 @@ def create_asr_trainer(args, device):
 
         class MyPrintingCallback(pl.Callback):
 
+            def test_epoch_end(self, outputs):
+                if self.trainer.is_global_zero:
+                    outputs = self.all_gather(outputs)
+                    logger.info(outputs)
+
             def on_epoch_end(self , trainer, pl_module):
 
                 try:
