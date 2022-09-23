@@ -9,7 +9,7 @@ data:
     vocab: data/libri_train_1h/vocab_char.txt
 
 model:
-  name: ctc_asr
+  name: rna_asr
   extractor:
     name: fbank
     train: false

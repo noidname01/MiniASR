@@ -27,6 +27,8 @@ def create_asr_trainer(args, device):
         logging.info(f'Creating ASR model (type = {args.model.name}).')
         if args.model.name == 'ctc_asr':
             from miniasr.model.ctc_asr import ASR
+        elif args.model.name == 'rna_asr':
+            from miniasr.model.rna_asr import ASR
         else:
             raise NotImplementedError(
                 '{} ASR type is not supported.'.format(args.model.name))
