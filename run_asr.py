@@ -94,13 +94,13 @@ def main():
     # Get device
     device = torch.device('cpu' if args.cpu else 'cuda:0')
 
-    if not args.test:
+    if  args.mode=='train':
         # Training
         logging.info('Training mode.')
         args, tr_loader, dv_loader, _, model, trainer = \
             create_asr_trainer(args, device)
         trainer.fit(model, tr_loader, dv_loader)
-    else:
+    elif args.mode== 'test':
         # Testing
         logging.info('Testing mode.')
         args, _, dv_loader, _, model, trainer = \
