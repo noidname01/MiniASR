@@ -95,7 +95,7 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
     else
         run_asr.py \
             --config config/predict.yaml \
-            --predict \
+            --test \
             --ckpt $ckpt
     fi
 fi
