@@ -159,6 +159,7 @@ class ASR(BaseASR):
         print("DTYPE")
         print(logits.dtype)
         logits = logits.cpu().numpy()
+        print(logits.dtype)
         logits = np.delete(logits,2,2)
         logits = np.delete(logits,3,2)
         new_logits = np.copy(logits[:,:,3:])
