@@ -17,7 +17,7 @@ class LanguageModel(object):
     Args:
       lm_file (str): Path to dictionary mapping between prefixes and lm probabilities. 
     """
-    lm = pickle.load(open("./data/language_model.p", 'rb'))
+    lm = pickle.load(open("./model/ctc_libri-10h_char/language_model.p", 'rb'))
     self._model = defaultdict(lambda: 1e-11, lm)
 
   def __call__(self, prefix):
