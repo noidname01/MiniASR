@@ -100,7 +100,7 @@ def main():
         args, tr_loader, dv_loader, _, model, trainer = \
             create_asr_trainer(args, device)
         trainer.fit(model, tr_loader, dv_loader)
-    elif args.mode== 'test':
+    elif args.mode == 'dev':
         # Testing
         logging.info('Testing mode.')
         args, _, dv_loader, _, model, trainer = \
