@@ -19,7 +19,7 @@ import os
 # from collections import defaultdict
 # import pickle
 # import numpy as np
-from miniasr.prefix_beam_search import prefix_beam_search
+from miniasr.prefix_beam_search.prefix_beam_search import prefix_beam_search
 from miniasr.prefix_beam_search.LanguageModel import LanguageModel
 
 
