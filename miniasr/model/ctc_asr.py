@@ -157,20 +157,18 @@ class ASR(BaseASR):
         return self.greedy_decode(logits, enc_len)
 
     def custom_decode(self, logits, enc_len):
-        print("DTYPE")
         
         logits = self.softmax(logits)
-        print(logits.dtype)
-        print(logits)
         logits = logits.cpu().numpy()
-        print(logits.dtype)
         logits = np.delete(logits,2,2)
         logits = np.delete(logits,3,2)
         new_logits = np.copy(logits[:,:,3:])
         logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
         new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
+
+        print(new_logits.shape)
         
-        return [  prefix_beam_search(logits[i], lm=self.language_model) for i in range(logits.shape[0]) ]
+        return [  prefix_beam_search(new_logits[i], lm=self.language_model) for i in range(new_logits.shape[0]) ]
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
