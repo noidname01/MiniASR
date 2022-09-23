@@ -150,7 +150,8 @@ class ASR(BaseASR):
     def decode(self, logits, enc_len, decode_type=None):
         ''' Decoding. '''
         if self.enable_beam_decode and decode_type != 'greedy':
-            # return self.beam_decode(logits, enc_len)
+            return self.beam_decode(logits, enc_len)
+        if decode_type=='custom':
             return self.custom_decode(logits, enc_len)
         return self.greedy_decode(logits, enc_len)
 
