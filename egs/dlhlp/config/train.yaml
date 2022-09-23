@@ -24,13 +24,13 @@ model:
     algo: Adam
     kwargs:
       lr: 0.0001
-      #specaugment:
-      #freq_mask_range: [0, 20]
-      #freq_mask_num: 2
-      #time_mask_range: [0, 40]
-      #time_mask_num: 2
-      #time_mask_max: 1.0
-      #time_warp_w: 80
+      specaugment:
+        freq_mask_range: [0, 20]
+        freq_mask_num: 2
+        time_mask_range: [0, 40]
+        time_mask_num: 2
+        time_mask_max: 1.0
+        time_warp_w: 80
 
 hparam:
   train_batch_size: 32
@@ -48,7 +48,7 @@ checkpoint_callbacks:
 trainer:
   max_epochs: 500
   max_steps: 100000
-  check_val_every_n_epoch: 1
+  check_val_every_n_epoch: 3
   gpus: 1
   precision: 16
   logger: true
