@@ -32,8 +32,6 @@ class ASR(BaseASR):
     def __init__(self, tokenizer, args):
         super().__init__(tokenizer, args)
 
-        print(os.path.abspath('.'))
-
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:
             self.encoder = RNNEncoder(self.in_dim, **args.model.encoder)
