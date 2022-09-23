@@ -53,6 +53,7 @@ class ASR(BaseASR):
 
         # Language model
         self.language_model = LanguageModel()
+        self.softmax = nn.Softmax(dim=2)
 
     def setup_flashlight(self):
         '''
@@ -157,8 +158,10 @@ class ASR(BaseASR):
 
     def custom_decode(self, logits, enc_len):
         print("DTYPE")
-        logits = logits.type(torch.DoubleTensor) 
+        
+        logits = self.softmax(logits)
         print(logits.dtype)
+        print(logits)
         logits = logits.cpu().numpy()
         print(logits.dtype)
         logits = np.delete(logits,2,2)
