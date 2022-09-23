@@ -163,6 +163,10 @@ class BaseASR(pl.LightningModule):
                                  feat_len, text, text_len)
 
             # Decode (hypotheses)
+            print("\n\n\n\nlogits")
+            print(logits.shape)
+            print(logits)
+            print("\n\n\n\n")
             hyps = self.decode(logits, enc_len)
 
             # Recover reference text
