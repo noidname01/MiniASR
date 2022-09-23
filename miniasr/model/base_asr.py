@@ -163,10 +163,6 @@ class BaseASR(pl.LightningModule):
                                  feat_len, text, text_len)
 
             # Decode (hypotheses)
-            print("\n\n\n\nlogits")
-            print(logits.shape)
-            print(logits)
-            print(enc_len)
             # print(self.tokenizer.decode(torch(), ignore_repeat=True))
             
             hyps = self.decode(logits, enc_len)

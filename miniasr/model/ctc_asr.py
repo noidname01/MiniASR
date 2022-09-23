@@ -167,7 +167,9 @@ class ASR(BaseASR):
         new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
 
         print(new_logits.shape)
-        
+        print('testestest1')
+        print(prefix_beam_search(new_logits[0], lm=self.language_model))
+        print('testestest2')
         return [  prefix_beam_search(new_logits[i], lm=self.language_model) for i in range(new_logits.shape[0]) ]
 
     def greedy_decode(self, logits, enc_len):
