@@ -167,9 +167,10 @@ class BaseASR(pl.LightningModule):
             print(logits.shape)
             print(logits)
             print(enc_len)
-            print("\n\n\n\n")
+            # print(self.tokenizer.decode(torch(), ignore_repeat=True))
+            print(enc_len)
             hyps = self.decode(logits, enc_len)
-
+            print("\n\n\n\n")
             # Recover reference text
             refs = [self.tokenizer.decode(text[i].cpu().tolist())
                     for i in range(len(text))]

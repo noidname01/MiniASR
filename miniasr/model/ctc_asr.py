@@ -136,8 +136,18 @@ class ASR(BaseASR):
     def decode(self, logits, enc_len, decode_type=None):
         ''' Decoding. '''
         if self.enable_beam_decode and decode_type != 'greedy':
-            return self.beam_decode(logits, enc_len)
+            # return self.beam_decode(logits, enc_len)
+            return self.custom_decode(logits, enc_len)
         return self.greedy_decode(logits, enc_len)
+
+    def custom_decode(self, logits, enc_len):
+        logits = logits.cpu().numpy()
+        logits = np.delete(logits,2,2)
+        logits = np.delete(logits,2,3)
+        new_logits = np.copy(logits[:,:,3:])
+        logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
+        new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
+        pass
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
