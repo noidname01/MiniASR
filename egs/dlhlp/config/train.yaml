@@ -1,4 +1,5 @@
 mode: train
+title: origin_baseline
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
