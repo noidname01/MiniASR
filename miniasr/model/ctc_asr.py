@@ -158,7 +158,7 @@ class ASR(BaseASR):
     def custom_decode(self, logits, enc_len):
         logits = logits.cpu().numpy()
         logits = np.delete(logits,2,2)
-        logits = np.delete(logits,2,3)
+        logits = np.delete(logits,3,2)
         new_logits = np.copy(logits[:,:,3:])
         logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
         new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
