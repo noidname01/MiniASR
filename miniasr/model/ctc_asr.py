@@ -157,6 +157,7 @@ class ASR(BaseASR):
 
     def custom_decode(self, logits, enc_len):
         print("DTYPE")
+        logits = logits.type(torch.DoubleTensor) 
         print(logits.dtype)
         logits = logits.cpu().numpy()
         print(logits.dtype)
