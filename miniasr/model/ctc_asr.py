@@ -66,6 +66,10 @@ class ASR(BaseASR):
             CriterionType, LexiconDecoderOptions, LexiconDecoder, KenLM, Trie, SmearingMode)
 
         token_dict = Dictionary(self.args.decode.token)
+        print("\n\n")
+        print(token_dict)
+        print("\n\n")
+        
         lexicon = load_words(self.args.decode.lexicon)
         word_dict = create_word_dict(lexicon)
 
