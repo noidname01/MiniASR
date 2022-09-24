@@ -13,7 +13,7 @@ from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
 
 # =========================================
-import os
+import json
 # from glob import glob
 # from string import ascii_lowercase
 # from collections import defaultdict
@@ -67,9 +67,9 @@ class ASR(BaseASR):
 
         token_dict = Dictionary(self.args.decode.token)
         print("\n\n")
-        print(token_dict)
+        print(json.dumps(token_dict, indent = 4))
         print("\n\n")
-        
+
         lexicon = load_words(self.args.decode.lexicon)
         word_dict = create_word_dict(lexicon)
 
