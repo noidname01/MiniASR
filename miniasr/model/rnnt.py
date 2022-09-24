@@ -1,6 +1,9 @@
+import torch
 import torch.nn as nn
 from torch import Tensor
-from typing import Tuple
+
+from rnnt.decoder import DecoderRNNT
+from rnnt.encoder import EncoderRNNT
 
 
 class EncoderRNNT(nn.Module):
@@ -54,9 +57,18 @@ class EncoderRNNT(nn.Module):
         )
         self.out_proj = nn.Linear(hidden_state_dim << 1 if bidirectional else hidden_state_dim, output_dim)
 
-    
+    def count_parameters(self) -> int:
+        """ Count parameters of encoder """
+        return sum([p.numel for p in self.parameters()])
+
+    def update_dropout(self, dropout_p: float) -> None:
+        """ Update dropout probability of encoder """
+        for name, child in self.named_children():
+            if isinstance(child, nn.Dropout):
+                child.p = dropout_p
 
     def forward(self, inputs: Tensor, input_lengths: Tensor) -> Tuple[Tensor, Tensor]:
+        
         inputs = nn.utils.rnn.pack_padded_sequence(inputs.transpose(0, 1), input_lengths.cpu())
         outputs, hidden_states = self.rnn(inputs)
         outputs, _ = nn.utils.rnn.pad_packed_sequence(outputs)
@@ -65,6 +77,29 @@ class EncoderRNNT(nn.Module):
     
     
 class DecoderRNNT(nn.Module):
+    """
+    Decoder of RNN-Transducer
+    Args:
+        num_classes (int): number of classification
+        hidden_state_dim (int, optional): hidden state dimension of decoder (default: 512)
+        output_dim (int, optional): output dimension of encoder and decoder (default: 512)
+        num_layers (int, optional): number of decoder layers (default: 1)
+        rnn_type (str, optional): type of rnn cell (default: lstm)
+        sos_id (int, optional): start of sentence identification
+        eos_id (int, optional): end of sentence identification
+        dropout_p (float, optional): dropout probability of decoder
+    Inputs: inputs, input_lengths
+        inputs (torch.LongTensor): A target sequence passed to decoder. `IntTensor` of size ``(batch, seq_length)``
+        input_lengths (torch.LongTensor): The length of input tensor. ``(batch)``
+        hidden_states (torch.FloatTensor): A previous hidden state of decoder. `FloatTensor` of size
+            ``(batch, seq_length, dimension)``
+    Returns:
+        (Tensor, Tensor):
+        * decoder_outputs (torch.FloatTensor): A output sequence of decoder. `FloatTensor` of size
+            ``(batch, seq_length, dimension)``
+        * hidden_states (torch.FloatTensor): A hidden state of decoder. `FloatTensor` of size
+            ``(batch, seq_length, dimension)``
+    """
     supported_rnns = {
         'lstm': nn.LSTM,
         'gru': nn.GRU,
@@ -128,8 +163,9 @@ class DecoderRNNT(nn.Module):
             outputs = self.out_proj(outputs)
 
         return outputs, hidden_states
-    
-    
+
+
+
 class RNNTransducer(nn.Module):
     """
     RNN-Transducer are a form of sequence-to-sequence models that do not employ attention mechanisms.
@@ -197,7 +233,7 @@ class RNNTransducer(nn.Module):
             eos_id=eos_id,
             dropout_p=decoder_dropout_p,
         )
-        self.fc = Linear(decoder_hidden_state_dim, num_classes, bias=False)
+        self.fc = nn.Linear(output_dim*2, num_classes, bias=False)
 
     def set_encoder(self, encoder):
         """ Setter for encoder """
@@ -242,9 +278,41 @@ class RNNTransducer(nn.Module):
             targets: Tensor,
             target_lengths: Tensor
     ) -> Tensor:
+        
         encoder_outputs, _ = self.encoder(inputs, input_lengths)
         decoder_outputs, _ = self.decoder(targets, target_lengths)
         outputs = self.joint(encoder_outputs, decoder_outputs)
         return outputs
 
-    
+    @torch.no_grad()
+    def decode(self, encoder_output: Tensor, max_length: int) -> Tensor:
+        
+        pred_tokens, hidden_state = list(), None
+        decoder_input = encoder_output.new_tensor([[self.decoder.sos_id]], dtype=torch.long)
+
+        for t in range(max_length):
+            decoder_output, hidden_state = self.decoder(decoder_input, hidden_states=hidden_state)
+            step_output = self.joint(encoder_output[t].view(-1), decoder_output.view(-1))
+            step_output = step_output.softmax(dim=0)
+            pred_token = step_output.argmax(dim=0)
+            pred_token = int(pred_token.item())
+            pred_tokens.append(pred_token)
+            decoder_input = step_output.new_tensor([[pred_token]], dtype=torch.long)
+
+        return torch.LongTensor(pred_tokens)
+
+    @torch.no_grad()
+    def recognize(self, inputs: Tensor, input_lengths: Tensor) -> Tensor:
+        
+        outputs = list()
+
+        encoder_outputs, output_lengths = self.encoder(inputs, input_lengths)
+        max_length = encoder_outputs.size(1)
+
+        for encoder_output in encoder_outputs:
+            decoded_seq = self.decode(encoder_output, max_length)
+            outputs.append(decoded_seq)
+
+        outputs = torch.stack(outputs, dim=1).transpose(0, 1)
+
+        return outputs
