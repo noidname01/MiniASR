@@ -2,9 +2,6 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from rnnt.decoder import DecoderRNNT
-from rnnt.encoder import EncoderRNNT
-
 
 class EncoderRNNT(nn.Module):
     """
