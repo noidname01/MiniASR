@@ -67,7 +67,7 @@ class ASR(BaseASR):
 
         token_dict = Dictionary(self.args.decode.token)
         print("\n\n")
-        print(json.dumps(token_dict, indent = 4))
+        print(token_dict['a'])
         print("\n\n")
 
         lexicon = load_words(self.args.decode.lexicon)
