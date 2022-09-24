@@ -169,9 +169,9 @@ class BaseASR(pl.LightningModule):
             # print(self.tokenizer.decode(torch(), ignore_repeat=True))
             
             logits_np = logits.cpu().numpy()
-            print(logits_np)
-            with open('example_logits.pickle', 'wb') as handle:
-                pickle.dump(logits_np, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            print(logits_np[0])
+            # with open('example_logits.pickle', 'wb') as handle:
+            #     pickle.dump(logits_np[0], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
             hyps = self.decode(logits, enc_len)
@@ -180,8 +180,8 @@ class BaseASR(pl.LightningModule):
             refs = [self.tokenizer.decode(text[i].cpu().tolist())
                     for i in range(len(text))]
 
-            print(refs)
-            print(hyps)
+            print(refs[0])
+            print(hyps[0])
             print("\n\n\n\n")
             print(1+'1')
 
