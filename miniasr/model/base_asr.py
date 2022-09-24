@@ -16,6 +16,9 @@ from miniasr.utils import (
 from miniasr.data.audio import SpecAugment
 
 
+
+import pickle
+
 def get_model_stride(name):
     ''' Returns the stride of a model (in ms) '''
     return 20 if any(m in name.split('_') for m in ['hubert', 'wav2vec2']) else 10
@@ -165,6 +168,12 @@ class BaseASR(pl.LightningModule):
             # Decode (hypotheses)
             # print(self.tokenizer.decode(torch(), ignore_repeat=True))
             
+            logits_np = logits.cpu().numpy()
+            print(logits_np)
+            with open('example_logits.pickle', 'wb') as handle:
+                pickle.dump(logits_np, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
             hyps = self.decode(logits, enc_len)
 
             # Recover reference text
