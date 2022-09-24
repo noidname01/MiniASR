@@ -11,7 +11,7 @@ from torch import nn
 
 from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
-from rnnt import RNNTransducer
+from miniasr.model.rnnt import RNNTransducer
 
 
 class ASR(BaseASR):
@@ -25,14 +25,15 @@ class ASR(BaseASR):
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:
             self.encoder = RNNEncoder(self.in_dim, **args.model.encoder)
+            self.ctc_output_layer = nn.Linear(
+              self.encoder.out_dim, self.vocab_size)
         elif self.args.model.encoder.module == 'RNN-t':
            self.transducer = RNNTransducer(input_dim = self.in_dim, num_classes=self.vocab_size)
         else:
             raise NotImplementedError(
                 f'Unkown encoder module {self.args.model.encoder.module}')
 
-        self.ctc_output_layer = nn.Linear(
-            self.encoder.out_dim, self.vocab_size)
+        
 
         # Loss function (CTC loss)
         self.ctc_loss = torch.nn.CTCLoss(blank=0, zero_infinity=True)
