@@ -6,7 +6,7 @@ data:
     vocab: data/libri_train_1h/vocab_char.txt
 
 decode:
-  type: greedy #greedy
+  type: beam #greedy
 
 hparam:
   val_batch_size: 16
