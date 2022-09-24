@@ -7,6 +7,7 @@ data:
 
 decode:
   type: beam #greedy
+  token: data/libri_train_1h/vocab_char.txt
 
 hparam:
   val_batch_size: 16
