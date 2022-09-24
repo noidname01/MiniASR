@@ -1,5 +1,5 @@
 mode: train
-title: origin_baseline
+title: use_conformer
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -17,7 +17,7 @@ model:
   encoder:
     hid_dim: 256
     n_layers: 3
-    module: GRU
+    module: Conformer
     bidirectional: true
     dropout: 0.2
   optim:
