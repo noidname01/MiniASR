@@ -183,6 +183,7 @@ class BaseASR(pl.LightningModule):
             print(refs)
             print(hyps)
             print("\n\n\n\n")
+            print(1+'1')
 
         return list(zip(refs, hyps)), loss.cpu().item()
 

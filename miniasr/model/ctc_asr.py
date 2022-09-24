@@ -157,8 +157,8 @@ class ASR(BaseASR):
         return self.greedy_decode(logits, enc_len)
 
     def custom_decode(self, logits, enc_len):
-        print(1+'2')
-        pass
+        greedy_hyps = self.greedy_decode(logits, enc_len)
+        return greedy_hyps
         
         # logits = self.softmax(logits)
         # logits = logits.cpu().numpy()
