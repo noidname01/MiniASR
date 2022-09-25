@@ -279,6 +279,8 @@ class RNNTransducer(nn.Module):
         encoder_outputs, _ = self.encoder(inputs, input_lengths)
         decoder_outputs, _ = self.decoder(targets, target_lengths)
         outputs = self.joint(encoder_outputs, decoder_outputs)
+        
+        
         return outputs
 
     @torch.no_grad()
@@ -286,19 +288,38 @@ class RNNTransducer(nn.Module):
         
         pred_tokens, hidden_state = list(), None
         decoder_input = encoder_output.new_tensor([[self.decoder.sos_id]], dtype=torch.long)
-
+        prob = list();
         for t in range(max_length):
             decoder_output, hidden_state = self.decoder(decoder_input, hidden_states=hidden_state)
             step_output = self.joint(encoder_output[t].view(-1), decoder_output.view(-1))
             step_output = step_output.softmax(dim=0)
+            prob.append(step_output)
             pred_token = step_output.argmax(dim=0)
             pred_token = int(pred_token.item())
             pred_tokens.append(pred_token)
             decoder_input = step_output.new_tensor([[pred_token]], dtype=torch.long)
-
-        return torch.LongTensor(pred_tokens)
+        prob = torch.stack(prob, dim=1).transpose(0,1)
+    
+        return prob
 
     @torch.no_grad()
+    def get_prob(self, inputs: Tensor, input_lengths: Tensor) -> Tensor:
+        
+        outputs = list()
+
+        encoder_outputs, output_lengths = self.encoder(inputs, input_lengths)
+        max_length = encoder_outputs.size(1)
+        print("encoder1:", encoder_outputs.size())
+        
+        for encoder_output in encoder_outputs:
+            print("encoder2", encoder_output.size())
+            decoded_seq = self.decode(encoder_output, max_length)
+            outputs.append(decoded_seq)
+
+        outputs = torch.stack(outputs, dim=1).transpose(0,1)
+
+        return outputs
+    
     def recognize(self, inputs: Tensor, input_lengths: Tensor) -> Tensor:
         
         outputs = list()
