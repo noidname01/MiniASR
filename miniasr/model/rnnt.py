@@ -292,8 +292,8 @@ class RNNTransducer(nn.Module):
         for t in range(max_length):
             decoder_output, hidden_state = self.decoder(decoder_input, hidden_states=hidden_state)
             step_output = self.joint(encoder_output[t].view(-1), decoder_output.view(-1))
-            step_output = step_output.softmax(dim=0)
             prob.append(step_output)
+            step_output = step_output.softmax(dim=0)
             pred_token = step_output.argmax(dim=0)
             pred_token = int(pred_token.item())
             pred_tokens.append(pred_token)
