@@ -116,9 +116,9 @@ class ASR(BaseASR):
         feat, feat_len = self.extract_features(wave, wave_len)
         
         if self.args.model.encoder.module == 'RNN-t':
-            logits = self.transducer(feat, feat_len, text, text_len)
-            logits, logits_length = self.transducer.encoder
-            return logits, logits_length, feat, feat_len
+            output = self.transducer(feat, feat_len, text, text_len)
+            logits = self.transducer.recognize(feat, feat_len)
+            return logits, feat_len, feat, feat_len
         else:
             # Encode features
             enc, enc_len = self.encoder(feat, feat_len)
