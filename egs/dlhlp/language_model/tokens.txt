@@ -1,6 +1,6 @@
-<pad>
-<eos>
-<unk>
+<PAD>
+<EOS>
+<UNK>
 |
 '
 A
