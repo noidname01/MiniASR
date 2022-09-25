@@ -117,8 +117,8 @@ class ASR(BaseASR):
         
         if self.args.model.encoder.module == 'RNN-t':
             logits = self.transducer(feat, feat_len, text, text_len)
-            
-            return logits, feat_len, feat, feat_len
+            logits, logits_length = self.transducer.encoder
+            return logits, logits_length, feat, feat_len
         else:
             # Encode features
             enc, enc_len = self.encoder(feat, feat_len)
