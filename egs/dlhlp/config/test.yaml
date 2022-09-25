@@ -6,7 +6,7 @@ data:
     vocab: data/libri_train_1h/vocab_char.txt
 
 decode:
-  type: beam #greedy
+  type: custom #greedy
   token: data/libri_train_1h/vocab_char.txt
 
 hparam:

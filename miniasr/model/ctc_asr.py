@@ -69,8 +69,9 @@ class ASR(BaseASR):
 
         print(token_dict.get_index("A"))
         print(token_dict.get_index("B"))
-        print(token_dict.get_index("c"))
-        print(token_dict.get_index("|"))
+        print(token_dict.get_index(" "))
+        print(token_dict.get_index("'"))
+
 
         lexicon = load_words(self.args.decode.lexicon)
         word_dict = create_word_dict(lexicon)
@@ -163,8 +164,8 @@ class ASR(BaseASR):
         return self.greedy_decode(logits, enc_len)
 
     def custom_decode(self, logits, enc_len):
-        greedy_hyps = self.greedy_decode(logits, enc_len)
-        return greedy_hyps
+        stupid_hyps = self.stupid_decode(logits, enc_len)
+        return stupid_hyps
         
         # logits = self.softmax(logits)
         # logits = logits.cpu().numpy()
@@ -179,6 +180,13 @@ class ASR(BaseASR):
         # print(prefix_beam_search(new_logits[0], lm=self.language_model))
         # print('testestest2')
         # return [  prefix_beam_search(new_logits[i], lm=self.language_model) for i in range(new_logits.shape[0]) ]
+    def stupid_decode(self, logits, enc_len):
+        ''' CTC stupid decoding. '''
+        hyps = torch.argmax(logits, dim=2).cpu().tolist()  # Batch x Time
+        return [self.tokenizer.decode(h[:enc_len[i]], ignore_repeat=False)
+                for i, h in enumerate(hyps)]
+
+
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
