@@ -168,8 +168,8 @@ class BaseASR(pl.LightningModule):
             # Decode (hypotheses)
             # print(self.tokenizer.decode(torch(), ignore_repeat=True))
             
-            logits_np = logits.cpu().numpy()
-            print(logits_np[0])
+            # logits_np = logits.cpu().numpy()
+            # print(logits_np[0])
             # with open('example_logits.pickle', 'wb') as handle:
             #     pickle.dump(logits_np[0], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -187,7 +187,7 @@ class BaseASR(pl.LightningModule):
             print("-"*20)
             print(hyps[0])
             print("\n\n\n\n")
-            print(1+'1')
+            # print(1+'1')
 
         return list(zip(refs, hyps)), loss.cpu().item()
 

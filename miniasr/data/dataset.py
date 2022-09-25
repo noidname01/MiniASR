@@ -21,7 +21,7 @@ class ASRDataset(Dataset):
 
     def __init__(
             self, paths, tokenizer,
-            mode='train', max_len=1600):
+            mode='train', max_len=10000000):
         super().__init__()
 
         # Load preprocessed dictionaries
@@ -31,6 +31,9 @@ class ASRDataset(Dataset):
             with open(path, 'r') as fp:
                 d_list = json.load(fp)
             data_list += d_list
+
+        if max_len < len(data_list):
+            data_list = data_list[:max_len]
 
         self.mode = mode \
             if ((data_list[0].get('text', None) is not None)

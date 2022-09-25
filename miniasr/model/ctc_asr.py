@@ -73,8 +73,8 @@ class ASR(BaseASR):
 
         lm = KenLM(self.args.decode.lm, word_dict)
 
-        sil_idx = token_dict.get_index("<eos>")
-        unk_idx = word_dict.get_index("<unk>")
+        sil_idx = token_dict.get_index("<EOS>")
+        unk_idx = word_dict.get_index("<UNK>")
 
         trie = Trie(token_dict.index_size(), sil_idx)
         start_state = lm.start(False)
@@ -101,7 +101,7 @@ class ASR(BaseASR):
             CriterionType.CTC
         )
 
-        blank_idx = token_dict.get_index("<pad>")  # for CTC
+        blank_idx = token_dict.get_index("<PAD>")  # for CTC
         is_token_lm = True  # we use word-level LM
         self.flashlight_decoder = LexiconDecoder(
             options, trie, lm, sil_idx, blank_idx, unk_idx, [], is_token_lm)
@@ -179,7 +179,7 @@ class ASR(BaseASR):
     def test_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
         hyps = torch.argmax(logits, dim=2).cpu().tolist()  # Batch x Time
-        print(hyps)
+        # print(hyps)
         return [self.tokenizer.decode(h[:enc_len[i]], ignore_repeat=True)
                 for i, h in enumerate(hyps)]
   
@@ -203,18 +203,18 @@ class ASR(BaseASR):
             hyps = self.flashlight_decoder.decode(
                 emissions.data_ptr(), enc_len[i], self.vocab_size)
 
-            print("\n\nHYPS" + str(i))
-            print(hyps[0].tokens)
-            hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
-            print(hyp.strip())
-            print(greedy_hyps[i])
+            # print("\n\nHYPS" + str(i))
+            # hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
+            # print(hyp.strip())
+            # print("="*50)
+            # print(greedy_hyps[i])
             
             if len(hyps) > 0 and hyps[0].score < 10000.0:
-                hyp = self.tokenizer.decode(hyps[0].tokens, ignore_repeat=True)
+                hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
                 beam_hyps.append(hyp.strip())
-                print('check1')
+                # print('beam')
             else:
                 beam_hyps.append(greedy_hyps[i])
-                print('check2')
+                # print('greedy')
 
         return beam_hyps
