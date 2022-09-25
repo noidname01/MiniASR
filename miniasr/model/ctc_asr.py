@@ -67,18 +67,13 @@ class ASR(BaseASR):
 
         token_dict = Dictionary(self.args.decode.token)
 
-        print(token_dict.get_index("A"))
-        print(token_dict.get_index("B"))
-        print(token_dict.get_index(" "))
-        print(token_dict.get_index("'"))
-
 
         lexicon = load_words(self.args.decode.lexicon)
         word_dict = create_word_dict(lexicon)
 
         lm = KenLM(self.args.decode.lm, word_dict)
 
-        sil_idx = token_dict.get_index("|")
+        sil_idx = token_dict.get_index("<eos>")
         unk_idx = word_dict.get_index("<unk>")
 
         trie = Trie(token_dict.index_size(), sil_idx)
@@ -106,8 +101,8 @@ class ASR(BaseASR):
             CriterionType.CTC
         )
 
-        blank_idx = token_dict.get_index("#")  # for CTC
-        is_token_lm = False  # we use word-level LM
+        blank_idx = token_dict.get_index("<pad>")  # for CTC
+        is_token_lm = True  # we use word-level LM
         self.flashlight_decoder = LexiconDecoder(
             options, trie, lm, sil_idx, blank_idx, unk_idx, [], is_token_lm)
         self.token_dict = token_dict
@@ -164,8 +159,9 @@ class ASR(BaseASR):
         return self.greedy_decode(logits, enc_len)
 
     def custom_decode(self, logits, enc_len):
-        stupid_hyps = self.stupid_decode(logits, enc_len)
-        return stupid_hyps
+
+        greedy_hyps = self.test_decode(logits, enc_len)
+        return greedy_hyps
         
         # logits = self.softmax(logits)
         # logits = logits.cpu().numpy()
@@ -180,13 +176,14 @@ class ASR(BaseASR):
         # print(prefix_beam_search(new_logits[0], lm=self.language_model))
         # print('testestest2')
         # return [  prefix_beam_search(new_logits[i], lm=self.language_model) for i in range(new_logits.shape[0]) ]
-    def stupid_decode(self, logits, enc_len):
-        ''' CTC stupid decoding. '''
+    def test_decode(self, logits, enc_len):
+        ''' CTC greedy decoding. '''
         hyps = torch.argmax(logits, dim=2).cpu().tolist()  # Batch x Time
-        return [self.tokenizer.decode(h[:enc_len[i]], ignore_repeat=False)
+        print(hyps)
+        return [self.tokenizer.decode(h[:enc_len[i]], ignore_repeat=True)
                 for i, h in enumerate(hyps)]
-
-
+  
+      
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''
@@ -206,10 +203,18 @@ class ASR(BaseASR):
             hyps = self.flashlight_decoder.decode(
                 emissions.data_ptr(), enc_len[i], self.vocab_size)
 
+            print("\n\nHYPS" + str(i))
+            print(hyps[0].tokens)
+            hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
+            print(hyp.strip())
+            print(greedy_hyps[i])
+            
             if len(hyps) > 0 and hyps[0].score < 10000.0:
                 hyp = self.tokenizer.decode(hyps[0].tokens, ignore_repeat=True)
                 beam_hyps.append(hyp.strip())
+                print('check1')
             else:
                 beam_hyps.append(greedy_hyps[i])
+                print('check2')
 
         return beam_hyps

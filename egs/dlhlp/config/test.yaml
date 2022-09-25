@@ -6,8 +6,19 @@ data:
     vocab: data/libri_train_1h/vocab_char.txt
 
 decode:
-  type: custom #greedy
-  token: data/libri_train_1h/vocab_char.txt
+  type: beam #greedy
+  token: language_model/tokens.txt
+  lexicon: language_model/librispeech-char-lexicon.txt
+  lm: language_model/3-gram.pruned.3e-7.arpa
+  beam_size: 100
+  token_beam_size: 31
+  beam_threshold: 1000
+  lm_weight: -1.0
+  word_score: -10.0
+  sil_score: -2.0
+  log_add: False
+
+
 
 hparam:
   val_batch_size: 16
