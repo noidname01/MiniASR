@@ -180,13 +180,13 @@ class BaseASR(pl.LightningModule):
             refs = [self.tokenizer.decode(text[i].cpu().tolist())
                     for i in range(len(text))]
 
-            print("\nREFS:")
-            print("-"*20)
-            print(refs[0])
-            print("\nHYPS:")
-            print("-"*20)
-            print(hyps[0])
-            print("\n\n\n\n")
+            # print("\nREFS:")
+            # print("-"*20)
+            # print(refs[0])
+            # print("\nHYPS:")
+            # print("-"*20)
+            # print(hyps[0])
+            # print("\n\n\n\n")
             # print(1+'1')
 
         return list(zip(refs, hyps)), loss.cpu().item()

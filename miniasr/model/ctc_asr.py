@@ -73,7 +73,7 @@ class ASR(BaseASR):
 
         lm = KenLM(self.args.decode.lm, word_dict)
 
-        sil_idx = token_dict.get_index("<EOS>")
+        sil_idx = token_dict.get_index("|")
         unk_idx = word_dict.get_index("<UNK>")
 
         trie = Trie(token_dict.index_size(), sil_idx)
@@ -101,8 +101,8 @@ class ASR(BaseASR):
             CriterionType.CTC
         )
 
-        blank_idx = token_dict.get_index("<PAD>")  # for CTC
-        is_token_lm = True  # we use word-level LM
+        blank_idx = token_dict.get_index("-")  # for CTC
+        is_token_lm = False  # we use word-level LM
         self.flashlight_decoder = LexiconDecoder(
             options, trie, lm, sil_idx, blank_idx, unk_idx, [], is_token_lm)
         self.token_dict = token_dict
@@ -195,26 +195,28 @@ class ASR(BaseASR):
         ''' Flashlight beam decoding. '''
 
         greedy_hyps = self.greedy_decode(logits, enc_len)
-        log_probs = torch.log_softmax(logits, dim=2) / np.log(10)
+        # log_probs = torch.log_softmax(logits, dim=2) / np.log(10)
 
         beam_hyps = []
-        for i, log_prob in enumerate(log_probs):
-            emissions = log_prob.cpu()
+        for i, logit in enumerate(logits):
+            # emissions = log_prob.cpu()
+            emissions = logit.cpu().numpy()
+            # hyps = self.flashlight_decoder.decode(
+            #     emissions.data_ptr(), enc_len[i], self.vocab_size)
             hyps = self.flashlight_decoder.decode(
-                emissions.data_ptr(), enc_len[i], self.vocab_size)
+                emissions.ctypes.data, enc_len[i], self.vocab_size)
 
             # print("\n\nHYPS" + str(i))
             # hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
             # print(hyp.strip())
             # print("="*50)
             # print(greedy_hyps[i])
+            # print('score: ' + str(hyps[0].score))
             
-            if len(hyps) > 0 and hyps[0].score < 10000.0:
+            if len(hyps) > 0 and hyps[0].score < 100000.0:
                 hyp = self.tokenizer.decode(hyps[0].tokens[1:], ignore_repeat=True)
                 beam_hyps.append(hyp.strip())
-                # print('beam')
             else:
                 beam_hyps.append(greedy_hyps[i])
-                # print('greedy')
 
         return beam_hyps
