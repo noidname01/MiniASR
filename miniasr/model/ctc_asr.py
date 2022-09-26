@@ -156,8 +156,8 @@ class ASR(BaseASR):
             emissions = log_prob.cpu()
             hyps = self.flashlight_decoder.decode(
                 emissions.data_ptr(), enc_len[i], self.vocab_size)
-
-            if len(hyps) > 0 and hyps[0].score < 10000.0:
+            print("score: " + str(hyps[0].score))
+            if len(hyps) > 0 and hyps[0].score < self.args.decoder.beam_max_score:
                 hyp = self.tokenizer.decode(hyps[0].tokens, ignore_repeat=True)
                 beam_hyps.append(hyp.strip())
             else:
