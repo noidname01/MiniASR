@@ -4,10 +4,14 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
+  max_len: 160
 
 decode:
   type: beam  # beam / greedy
-  beam_max_score: 10000.0 
+  token: language_model/token.txt
+  lm: language_model/3-gram.pruned.3e-7.bin
+  lexicon: language_model/librispeech-char-lexicon.txt
+  beam_max_score: 100000.0 
   beam_size: 50
   token_beam_size: 20
   beam_threshold: 1000

@@ -111,7 +111,7 @@ def create_dataloader(args, tokenizer=None):
     elif args.mode in ['dev', 'wild']:
         # Dev mode: dev set only (w/ transcriptions)
         # Wild mode: w/o transcriptions
-        dv_set = ASRDataset(args.data.dev_paths, tokenizer, args.mode)
+        dv_set = ASRDataset(args.data.dev_paths, tokenizer, args.mode, max_len=args.data.max_len)
 
         dv_loader = DataLoader(
             dv_set, batch_size=args.hparam.val_batch_size,

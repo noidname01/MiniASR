@@ -149,15 +149,16 @@ class ASR(BaseASR):
         ''' Flashlight beam decoding. '''
 
         greedy_hyps = self.greedy_decode(logits, enc_len)
-        log_probs = torch.log_softmax(logits, dim=2) / np.log(10)
+        #log_probs = torch.log_softmax(logits, dim=2) / np.log(10)
 
         beam_hyps = []
-        for i, log_prob in enumerate(log_probs):
-            emissions = log_prob.cpu()
+        for i, logit in enumerate(logits):
+            #emissions = log_prob.cpu()
+            emissions = logit.cpu().numpy()
             hyps = self.flashlight_decoder.decode(
-                emissions.data_ptr(), enc_len[i], self.vocab_size)
+                emissions.ctypes.data , enc_len[i], self.vocab_size)
             print("score: " + str(hyps[0].score))
-            if len(hyps) > 0 and hyps[0].score < self.args.decoder.beam_max_score:
+            if len(hyps) > 0 and hyps[0].score < self.args.decode.beam_max_score:
                 hyp = self.tokenizer.decode(hyps[0].tokens, ignore_repeat=True)
                 beam_hyps.append(hyp.strip())
             else:
