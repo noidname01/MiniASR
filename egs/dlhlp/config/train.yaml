@@ -14,11 +14,11 @@ model:
     train: false
     feature: hidden_states
   encoder:
-    hid_dim: 256
-    n_layers: 3
-    module: GRU
+    hid_dim: 512
+    n_layers: 5
+    module: Custom
     bidirectional: true
-    dropout: 0.2
+    dropout: 0.5
   optim:
     algo: Adam
     kwargs:

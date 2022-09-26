@@ -10,7 +10,7 @@ import torch
 from torch import nn
 
 from miniasr.model.base_asr import BaseASR
-from miniasr.module import RNNEncoder
+from miniasr.module import RNNEncoder, CNNRNNEncoder
 
 
 class ASR(BaseASR):
@@ -24,6 +24,10 @@ class ASR(BaseASR):
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:
             self.encoder = RNNEncoder(self.in_dim, **args.model.encoder)
+        elif self.args.model.encoder.module == "Custom":
+            self.encoder = CNNRNNEncoder(
+                self.in_dim, **args.model.encoder
+            )
         else:
             raise NotImplementedError(
                 f'Unkown encoder module {self.args.model.encoder.module}')
