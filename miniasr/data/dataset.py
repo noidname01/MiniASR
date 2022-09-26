@@ -32,6 +32,8 @@ class ASRDataset(Dataset):
                 d_list = json.load(fp)
             data_list += d_list
 
+        data_list = data_list[:max_len]
+
         self.mode = mode \
             if ((data_list[0].get('text', None) is not None)
                 and (tokenizer is not None)) else 'wild'
