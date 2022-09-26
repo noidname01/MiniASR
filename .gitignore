@@ -138,3 +138,4 @@ dmypy.json
 egs/dlhlp/model
 egs/dlhlp/data
 egs/dlhlp/language_model
+egs/dlhlp/logs
