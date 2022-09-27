@@ -1,5 +1,5 @@
 mode: train
-title: no-title
+title: DeepSpeech2
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -12,15 +12,15 @@ data:
 model:
   name: ctc_asr
   extractor:
-    name: fbank
+    name: spectrogram
     train: false
     feature: hidden_states
   encoder:
-    hid_dim: 256
-    n_layers: 3
+    hid_dim: 512
+    n_layers: 5
     module: GRU
     bidirectional: true
-    dropout: 0.2
+    dropout: 0.5
   optim:
     algo: Adam
     kwargs:
@@ -34,8 +34,8 @@ model:
     time_warp_w: 80
 
 hparam:
-  train_batch_size: 32
-  val_batch_size: 32
+  train_batch_size: 16
+  val_batch_size: 16
   accum_grad: 1
   grad_clip: 5
   njobs: 4
@@ -47,7 +47,7 @@ checkpoint_callbacks:
   save_top_k: 5  # -1: all ckpts will be saved
 
 trainer:
-  max_epochs: 500
+  max_epochs: 120
   max_steps: 100000
   check_val_every_n_epoch: 3
   gpus: 1
@@ -55,5 +55,5 @@ trainer:
   logger: true
   log_every_n_steps: 5
   flush_logs_every_n_steps: 5
-  default_root_dir: model/ctc_libri-10h_char
+  default_root_dir: model/0928-1
   deterministic: true

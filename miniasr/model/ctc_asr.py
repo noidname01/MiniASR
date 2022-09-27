@@ -28,8 +28,12 @@ class ASR(BaseASR):
             raise NotImplementedError(
                 f'Unkown encoder module {self.args.model.encoder.module}')
 
+        self.dense1 = nn.Linear(self.encoder.out_dim, self.encoder.out_dim)
+        self.relu1 = nn.ReLU()
+        self.dropout1 = nn.Dropout(0.5)
         self.ctc_output_layer = nn.Linear(
-            self.encoder.out_dim, self.vocab_size)
+            self.encoder.out_dim, self.vocab_size
+        )
 
         # Loss function (CTC loss)
         self.ctc_loss = torch.nn.CTCLoss(blank=0, zero_infinity=True)
@@ -115,6 +119,10 @@ class ASR(BaseASR):
         enc, enc_len = self.encoder(feat, feat_len)
 
         # Project hidden features to vocabularies
+
+        enc = self.dense1(enc)
+        enc = self.relu1(enc)
+        enc = self.dropout1(enc)
         logits = self.ctc_output_layer(enc)
 
         return logits, enc_len, feat, feat_len

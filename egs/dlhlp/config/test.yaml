@@ -29,5 +29,5 @@ hparam:
 trainer:
   gpus: 1
   logger: false
-  default_root_dir: model/ctc_libri-10h_char
+  default_root_dir: model/0928-1
   deterministic: true
