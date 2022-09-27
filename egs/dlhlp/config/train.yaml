@@ -8,6 +8,7 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
+  max_len: 1000000
 
 model:
   name: cnn_rnn_asr
@@ -24,7 +25,7 @@ model:
   optim:
     algo: Adam
     kwargs:
-      lr: 0.0001
+      lr: 0.00005 # 0.0001
   specaugment:
     freq_mask_range: [0, 20]
     freq_mask_num: 2
