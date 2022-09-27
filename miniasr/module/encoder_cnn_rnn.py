@@ -24,23 +24,12 @@ class CNN_RNN_Encoder(nn.Module):
         super().__init__()
 
                                                                 # B * 1 * T * 240
-        self.conv1 = nn.Conv2d(1, 32, (11,11), padding=(5,5))      # B * 32 * T * 240
+        self.conv1 = nn.Conv2d(1, 32, (11,41), stride=(2,2), padding=(5,20))      # B * 32 * T * 240
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv2d(32, 32, (11,11), padding=(5,5) )   # B * 32 * T * 240
+        self.conv2 = nn.Conv2d(32, 32, (11,21), stride=(1,2), padding=(5,10) )   # B * 32 * T * 240
         self.relu2 = nn.ReLU()
 
-        self.maxpool1 = nn.MaxPool2d(kernel_size=(1,2))         # B * 32 * T * 120
-
-
-        self.conv3 = nn.Conv2d(16, 32, (11,11),padding=(5,5))      # B * 32 * T//2 * 120
-        self.relu3 = nn.ReLU()
-
-        self.conv4 = nn.Conv2d(32, 32, (11,11), padding=(5,5) )   # B * 32 * T//2 * 120
-        self.relu4 = nn.ReLU()
-
-        self.maxpool2 = nn.MaxPool2d(kernel_size=(1,2))         # B * 32 * T//4 * 60
-        
         # RNN model
         self.rnn = getattr(nn, "GRU")(
             input_size=1920,
@@ -65,19 +54,23 @@ class CNN_RNN_Encoder(nn.Module):
         '''
         feat = torch.reshape(feat, (32,1,-1,240))
         
-       
+        print('\n\n' + '-'*20)
+        print("feat: " + str(feat.shape))
         out = self.conv1(feat)
+        print("conv1: " + str(out.shape))
         out = self.relu1(out)
         out = self.conv2(out)
+        print("conv2: " + str(out.shape))
         out = self.relu2(out)
-        out = self.maxpool1(out)
+        #out = self.maxpool1(out)
+        print('-'*20 + '\n\n' )
 
         # out = self.conv3(out)
         # out = self.relu3(out)
         # out = self.conv4(out)
         # out = self.relu4(out)
         # out = self.maxpool2(out)
-        print(out.shape)
+        
         out = out.permute((0,2,3,1))
         out = torch.reshape(out, (32, -1, 1920))
 
