@@ -24,15 +24,15 @@ class CNN_RNN_Encoder(nn.Module):
         super().__init__()
 
                                                                 # B * 1 * T * 240
-        self.conv1 = nn.Conv2d(1, 32, (11,41), stride=(2,2), padding=(5,20))      # B * 32 * T * 240
+        self.conv1 = nn.Conv2d(1, 32, (11,41), stride=(2,2))      # B * 32 * T * 240
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv2d(32, 32, (11,21), stride=(1,2), padding=(5,10) )   # B * 32 * T * 240
+        self.conv2 = nn.Conv2d(32, 32, (11,21), stride=(1,2))   # B * 32 * T * 240
         self.relu2 = nn.ReLU()
 
         # RNN model
         self.rnn = getattr(nn, "GRU")(
-            input_size=1920,
+            input_size=45*32,
             hidden_size=hid_dim,
             num_layers=n_layers,
             dropout=dropout,
@@ -52,18 +52,18 @@ class CNN_RNN_Encoder(nn.Module):
                 out [float tensor]: encoded feature sequence
                 out_len [long tensor]: encoded feature lengths
         '''
-        feat = torch.reshape(feat, (32,1,-1,240))
+        feat = torch.reshape(feat, (32,1,-1,257))
         
-        print('\n\n' + '-'*20)
-        print("feat: " + str(feat.shape))
+        # print('\n\n' + '-'*20)
+        # print("feat: " + str(feat.shape))
         out = self.conv1(feat)
-        print("conv1: " + str(out.shape))
+        # print("conv1: " + str(out.shape))
         out = self.relu1(out)
         out = self.conv2(out)
-        print("conv2: " + str(out.shape))
+        # print("conv2: " + str(out.shape))
         out = self.relu2(out)
         #out = self.maxpool1(out)
-        print('-'*20 + '\n\n' )
+        # print('-'*20 + '\n\n' )
 
         # out = self.conv3(out)
         # out = self.relu3(out)
@@ -72,11 +72,18 @@ class CNN_RNN_Encoder(nn.Module):
         # out = self.maxpool2(out)
         
         out = out.permute((0,2,3,1))
-        out = torch.reshape(out, (32, -1, 1920))
+        out = torch.reshape(out, (32, -1, 45*32))
 
         if not self.training:
             self.rnn.flatten_parameters()
 
         out, _ = self.rnn(out)
+
+        feat_len = torch.sub(feat_len, 10)
+        feat_len = torch.mul(feat_len, 0.5)
+        feat_len = torch.floor(feat_len)
+        feat_len = torch.sub(feat_len, 10).to(torch.int32)
+
+        # print(out.shape)
 
         return out, feat_len

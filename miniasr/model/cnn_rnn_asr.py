@@ -114,22 +114,24 @@ class ASR(BaseASR):
         # Extract features
         feat, feat_len = self.extract_features(wave, wave_len)
 
-        print('\n\n')
-        print('='*20)
-        print('FEAT')
-        print(feat.shape)
-        print('='*20)
-        print('\n\n')
+        # print('\n\n')
+        # print('='*20)
+        # print('FEAT')
+        # print(feat.shape)
+        # print('='*20)
+        # print('\n\n')
 
         # Encode features
         enc, enc_len = self.encoder(feat, feat_len)
 
-        print('\n\n')
-        print('='*20)
-        print('ENC')
-        print(enc.shape)
-        print('='*20)
-        print('\n\n')
+        # print('\n\n')
+        # print('='*20)
+        # print('ENC')
+        # print(enc.shape)
+        # print('='*20)
+        # print('\n\n')
+
+        # print("enc_len=" + str(enc_len))
 
         # print('1' + 1)
 

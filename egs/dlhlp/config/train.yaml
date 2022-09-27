@@ -12,12 +12,12 @@ data:
 model:
   name: cnn_rnn_asr
   extractor:
-    name: fbank
+    name: spectrogram
     train: false
     feature: hidden_states
   encoder:
-    hid_dim: 256
-    n_layers: 3
+    hid_dim: 512
+    n_layers: 5
     module: CNN_RNN #GRU
     bidirectional: true
     dropout: 0.2
