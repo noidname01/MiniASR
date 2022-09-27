@@ -66,6 +66,8 @@ def load_from_checkpoint(
 
     if args.model.name == 'ctc_asr':
         from miniasr.model.ctc_asr import ASR
+    elif args.model.name == 'cnn_rnn_asr':
+        from miniasr.model.cnn_rnn_asr import ASR
     else:
         raise NotImplementedError(
             '{} ASR type is not supported.'.format(args.model.name))

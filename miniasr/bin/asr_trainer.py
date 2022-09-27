@@ -12,6 +12,66 @@ import requests
 
 from miniasr.data.dataloader import create_dataloader
 from miniasr.utils import load_from_checkpoint
+class MyPrintingCallback(pl.Callback):
+
+    def test_epoch_end(self, outputs):
+        if self.trainer.is_global_zero:
+            outputs = self.all_gather(outputs)
+            logging.info(outputs)
+
+    def on_epoch_end(self , trainer, pl_module):
+
+        try:
+
+            requestBody = {
+                "content": "Epoch " + str(trainer.current_epoch) + " finished!",
+                "title": args.title
+            }
+            req = requests.post("https://online-logs-viewer.herokuapp.com/logs", json=requestBody)
+            logging.info(req)
+        except Exception as e:
+            logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
+        
+    
+    def on_validation_end(self, trainer, pl_module):
+        if trainer.sanity_checking:
+            return
+        logging.info("EPOCH: " + str(trainer.current_epoch))
+        logging.info("-"*20)
+        logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
+        logging.info("VAL_WER: " + str(trainer.callback_metrics['val_wer'].item()))
+        logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))
+        logging.info("TRAIN_LOSS: " + str(trainer.callback_metrics['train_loss'].item()))
+
+        try:
+
+            requestBody = {
+                "content": {
+                    "epoch": trainer.current_epoch,
+                    "val_cer": trainer.callback_metrics['val_cer'].item(),
+                    "val_wer": trainer.callback_metrics['val_wer'].item(),
+                    "val_loss": trainer.callback_metrics['val_loss'].item(),
+                    "train_loss": trainer.callback_metrics['train_loss'].item()
+                },
+                "title": args.title
+            }
+            
+
+            req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json=requestBody)
+            logging.info(req)
+        except Exception as e:
+            logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
+        
+
+        logging.info('\n\nValidation loop ends.\n\n')
+        
+        
+    
+    def on_validation_start(self, trainer, pl_module):
+        if trainer.sanity_checking:
+            return
+        logging.info('\n\nValidation loop starts.\n\n')
+                
 
 
 def create_asr_trainer(args, device):
@@ -35,66 +95,6 @@ def create_asr_trainer(args, device):
 
         model = ASR(tokenizer, args).to(device)
 
-        class MyPrintingCallback(pl.Callback):
-
-            def test_epoch_end(self, outputs):
-                if self.trainer.is_global_zero:
-                    outputs = self.all_gather(outputs)
-                    logging.info(outputs)
-
-            def on_epoch_end(self , trainer, pl_module):
-
-                try:
-        
-                    requestBody = {
-                        "content": "Epoch " + str(trainer.current_epoch) + " finished!",
-                        "title": args.title
-                    }
-                    req = requests.post("https://online-logs-viewer.herokuapp.com/logs", json=requestBody)
-                    logging.info(req)
-                except Exception as e:
-                    logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
-                
-          
-            def on_validation_end(self, trainer, pl_module):
-                if trainer.sanity_checking:
-                    return
-                logging.info("EPOCH: " + str(trainer.current_epoch))
-                logging.info("-"*20)
-                logging.info("VAL_CER: " + str(trainer.callback_metrics['val_cer'].item()))
-                logging.info("VAL_WER: " + str(trainer.callback_metrics['val_wer'].item()))
-                logging.info("VAL_LOSS: " + str(trainer.callback_metrics['val_loss'].item()))
-                logging.info("TRAIN_LOSS: " + str(trainer.callback_metrics['train_loss'].item()))
-
-                try:
-        
-                    requestBody = {
-                        "content": {
-                            "epoch": trainer.current_epoch,
-                            "val_cer": trainer.callback_metrics['val_cer'].item(),
-                            "val_wer": trainer.callback_metrics['val_wer'].item(),
-                            "val_loss": trainer.callback_metrics['val_loss'].item(),
-                            "train_loss": trainer.callback_metrics['train_loss'].item()
-                        },
-                        "title": args.title
-                    }
-                    
-
-                    req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json=requestBody)
-                    logging.info(req)
-                except Exception as e:
-                    logging.error("An error ocurred when posting to Online-Logs-Viewer: " + str(e))
-                
-
-                logging.info('\n\nValidation loop ends.\n\n')
-                
-                
-            
-            def on_validation_start(self, trainer, pl_module):
-                if trainer.sanity_checking:
-                    return
-                logging.info('\n\nValidation loop starts.\n\n')
-                
 
         custom_callback = MyPrintingCallback()
 
@@ -128,6 +128,8 @@ def create_asr_trainer(args, device):
         # Load data & tokenizer
         tr_loader, dv_loader, _ = create_dataloader(args)
 
+        custom_callback = MyPrintingCallback()
+
         # Create checkpoint callbacks
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=args.trainer.default_root_dir,
@@ -139,7 +141,7 @@ def create_asr_trainer(args, device):
             resume_from_checkpoint=args.ckpt,
             accumulate_grad_batches=args.hparam.accum_grad,
             gradient_clip_val=args.hparam.grad_clip,
-            callbacks=[checkpoint_callback],
+            callbacks=[checkpoint_callback, custom_callback],
             **args.trainer)
 
     return args, tr_loader, dv_loader, tokenizer, model, trainer
