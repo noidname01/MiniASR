@@ -4,22 +4,21 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
-  max_len: 160 # max data, use 1000000 for default
+  max_len: 1000000
 
 decode:
-  type: beam #greedy
-  token: language_model/tokens.txt
-  lexicon: language_model/librispeech-char-lexicon.txt
+  type: greedy  # beam / greedy
+  token: language_model/token.txt
   lm: language_model/3-gram.pruned.3e-7.bin
+  lexicon: language_model/librispeech-char-lexicon.txt
+  beam_max_score: 100000.0 
   beam_size: 50
   token_beam_size: 20
-  beam_threshold: 5000
+  beam_threshold: 1000
   lm_weight: 2.0
   word_score: -0.5
   sil_score: 0.0
   log_add: False
-
-
 
 hparam:
   val_batch_size: 16

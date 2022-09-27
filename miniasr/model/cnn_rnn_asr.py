@@ -11,17 +11,7 @@ from torch import nn
 
 from miniasr.model.base_asr import BaseASR
 from miniasr.module import RNNEncoder
-
-# =========================================
-import json
-# from glob import glob
-# from string import ascii_lowercase
-# from collections import defaultdict
-# import pickle
-# import numpy as np
-from miniasr.prefix_beam_search.prefix_beam_search import prefix_beam_search
-from miniasr.prefix_beam_search.LanguageModel import LanguageModel
-
+from miniasr.module import CNN_RNN_Encoder
 
 
 class ASR(BaseASR):
@@ -35,6 +25,8 @@ class ASR(BaseASR):
         # Main model setup
         if self.args.model.encoder.module in ['RNN', 'GRU', 'LSTM']:
             self.encoder = RNNEncoder(self.in_dim, **args.model.encoder)
+        elif self.args.model.encoder.module == 'CNN_RNN':
+            self.encoder = CNN_RNN_Encoder(self.in_dim, **args.model.encoder)
         else:
             raise NotImplementedError(
                 f'Unkown encoder module {self.args.model.encoder.module}')
@@ -51,10 +43,6 @@ class ASR(BaseASR):
             self.enable_beam_decode = True
             self.setup_flashlight()
 
-        # Language model
-        self.language_model = LanguageModel()
-        self.softmax = nn.Softmax(dim=2)
-
     def setup_flashlight(self):
         '''
             Setup flashlight for beam decoding.
@@ -66,15 +54,13 @@ class ASR(BaseASR):
             CriterionType, LexiconDecoderOptions, LexiconDecoder, KenLM, Trie, SmearingMode)
 
         token_dict = Dictionary(self.args.decode.token)
-
-
         lexicon = load_words(self.args.decode.lexicon)
         word_dict = create_word_dict(lexicon)
 
         lm = KenLM(self.args.decode.lm, word_dict)
 
         sil_idx = token_dict.get_index("|")
-        unk_idx = word_dict.get_index("<UNK>")
+        unk_idx = word_dict.get_index("<unk>")
 
         trie = Trie(token_dict.index_size(), sil_idx)
         start_state = lm.start(False)
@@ -101,7 +87,7 @@ class ASR(BaseASR):
             CriterionType.CTC
         )
 
-        blank_idx = token_dict.get_index("-")  # for CTC
+        blank_idx = token_dict.get_index("#")  # for CTC
         is_token_lm = False  # we use word-level LM
         self.flashlight_decoder = LexiconDecoder(
             options, trie, lm, sil_idx, blank_idx, unk_idx, [], is_token_lm)
@@ -128,8 +114,24 @@ class ASR(BaseASR):
         # Extract features
         feat, feat_len = self.extract_features(wave, wave_len)
 
+        print('\n\n')
+        print('='*20)
+        print('FEAT')
+        print(feat.shape)
+        print('='*20)
+        print('\n\n')
+
         # Encode features
         enc, enc_len = self.encoder(feat, feat_len)
+
+        print('\n\n')
+        print('='*20)
+        print('ENC')
+        print(enc.shape)
+        print('='*20)
+        print('\n\n')
+
+        # print('1' + 1)
 
         # Project hidden features to vocabularies
         logits = self.ctc_output_layer(enc)
@@ -150,40 +152,11 @@ class ASR(BaseASR):
 
         return ctc_loss
 
-    def decode(self, logits, enc_len):
+    def decode(self, logits, enc_len, decode_type=None):
         ''' Decoding. '''
-        if self.enable_beam_decode and self.args.decode.type != 'greedy':
+        if self.enable_beam_decode and decode_type != 'greedy':
             return self.beam_decode(logits, enc_len)
-        if self.args.decode.type=='custom':
-            return self.custom_decode(logits, enc_len)
         return self.greedy_decode(logits, enc_len)
-
-    def custom_decode(self, logits, enc_len):
-
-        greedy_hyps = self.test_decode(logits, enc_len)
-        return greedy_hyps
-        
-        # logits = self.softmax(logits)
-        # logits = logits.cpu().numpy()
-        # logits = np.delete(logits,2,2)
-        # logits = np.delete(logits,3,2)
-        # new_logits = np.copy(logits[:,:,3:])
-        # logits[:,:,0], logits[:,:,2] = logits[:,:,2], logits[:,:,0].copy() 
-        # new_logits = np.concatenate((new_logits, logits[:,:,:3]), axis=2 )
-
-        # print(new_logits.shape)
-        # print('testestest1')
-        # print(prefix_beam_search(new_logits[0], lm=self.language_model))
-        # print('testestest2')
-        # return [  prefix_beam_search(new_logits[i], lm=self.language_model) for i in range(new_logits.shape[0]) ]
-    def test_decode(self, logits, enc_len):
-        ''' CTC greedy decoding. '''
-        hyps = torch.argmax(logits, dim=2).cpu().tolist()  # Batch x Time
-        # print(hyps)
-        return [self.tokenizer.decode(h[:enc_len[i]], ignore_repeat=True)
-                for i, h in enumerate(hyps)]
-  
-      
 
     def greedy_decode(self, logits, enc_len):
         ''' CTC greedy decoding. '''

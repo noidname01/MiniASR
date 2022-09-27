@@ -27,16 +27,13 @@ def create_asr_trainer(args, device):
         logging.info(f'Creating ASR model (type = {args.model.name}).')
         if args.model.name == 'ctc_asr':
             from miniasr.model.ctc_asr import ASR
-        elif args.model.name == 'rna_asr':
-            from miniasr.model.rna_asr import ASR
+        elif args.model.name == 'cnn_rnn_asr':
+            from miniasr.model.cnn_rnn_asr import ASR
         else:
             raise NotImplementedError(
                 '{} ASR type is not supported.'.format(args.model.name))
 
         model = ASR(tokenizer, args).to(device)
-
-        # Logger
-        #csv_logger = CSVLogger("./logs", name="mini_asr_training_log")
 
         class MyPrintingCallback(pl.Callback):
 
