@@ -1,5 +1,5 @@
 mode: train
-title: no-title
+title: CNN-0927
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -7,7 +7,7 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
-  max_len: 160
+  max_len: 100000000
 
 model:
   name: ctc_asr
@@ -16,7 +16,7 @@ model:
     train: false
     feature: hidden_states
   encoder:
-    hid_dim: 256
+    hid_dim: 512
     n_layers: 3
     module: GRU
     bidirectional: true
@@ -24,7 +24,7 @@ model:
   optim:
     algo: Adam
     kwargs:
-      lr: 0.0001
+      lr: 0.00001
   specaugment:
     freq_mask_range: [0, 20]
     freq_mask_num: 2
@@ -34,8 +34,8 @@ model:
     time_warp_w: 80
 
 hparam:
-  train_batch_size: 32
-  val_batch_size: 32
+  train_batch_size: 16
+  val_batch_size: 16
   accum_grad: 1
   grad_clip: 5
   njobs: 4
