@@ -6,6 +6,7 @@
 
 import logging
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import LearningRateMonitor
 from miniasr.data.dataloader import create_dataloader
 from miniasr.utils import load_from_checkpoint
 
@@ -32,6 +33,7 @@ def create_asr_trainer(args, device):
         model = ASR(tokenizer, args).to(device)
 
         custom_callback = CustomCallback(args)
+        lr_monitor = LearningRateMonitor(logging_interval='epoch')
         # Create checkpoint callbacks
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=args.trainer.default_root_dir,
@@ -42,7 +44,7 @@ def create_asr_trainer(args, device):
         trainer = pl.Trainer(
             accumulate_grad_batches=args.hparam.accum_grad,
             gradient_clip_val=args.hparam.grad_clip,
-            callbacks=[checkpoint_callback, custom_callback],
+            callbacks=[checkpoint_callback, custom_callback, lr_monitor],
             #logger=csv_logger,
             **args.trainer
         )
@@ -62,6 +64,8 @@ def create_asr_trainer(args, device):
         tr_loader, dv_loader, _ = create_dataloader(args)
 
         custom_callback = CustomCallback(args)
+        lr_monitor = LearningRateMonitor(logging_interval='epoch')
+
         # Create checkpoint callbacks
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=args.trainer.default_root_dir,
@@ -73,7 +77,7 @@ def create_asr_trainer(args, device):
             resume_from_checkpoint=args.ckpt,
             accumulate_grad_batches=args.hparam.accum_grad,
             gradient_clip_val=args.hparam.grad_clip,
-            callbacks=[checkpoint_callback, custom_callback],
+            callbacks=[checkpoint_callback, custom_callback, lr_monitor],
             **args.trainer)
 
     return args, tr_loader, dv_loader, tokenizer, model, trainer

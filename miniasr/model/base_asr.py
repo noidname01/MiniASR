@@ -6,6 +6,7 @@
 
 import logging
 from os.path import join
+from symbol import factor
 import time
 import torch
 import pytorch_lightning as pl
@@ -72,8 +73,19 @@ class BaseASR(pl.LightningModule):
 
     def configure_optimizers(self):
         ''' Sets optimizer. '''
-        return getattr(torch.optim, self.args.model.optim.algo)(
+        optimizer = getattr(torch.optim, self.args.model.optim.algo)(
             self.parameters(), **self.args.model.optim.kwargs)
+        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=2, min_lr=0.00001, verbose=True)
+        return {
+                    "optimizer": optimizer,
+                    "lr_scheduler": {
+                        "scheduler": lr_scheduler,
+                        "monitor": "val_loss",
+                        "frequency": 3
+                        # If "monitor" references validation metrics, then "frequency" should be set to a
+                        # multiple of "trainer.check_val_every_n_epoch".
+                    }
+                }
 
     def cal_feat_len(self, x_len: torch.Tensor):
         ''' Calculates feature lengths. '''

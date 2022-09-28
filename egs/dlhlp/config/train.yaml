@@ -7,7 +7,7 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
-  max_len: 160
+  max_len: 1000000
 
 model:
   name: ctc_asr
@@ -25,6 +25,7 @@ model:
     algo: Adam
     kwargs:
       lr: 0.0001
+      weight_decay: 0.0005
   specaugment:
     freq_mask_range: [0, 20]
     freq_mask_num: 2

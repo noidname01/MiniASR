@@ -57,7 +57,7 @@ class RNNEncoder(nn.Module):
 
         feat_size = feat.size()
         
-        feat = feat.view(feat_size[0], 1, -1, feat_size[2])
+        feat = feat.reshape(feat_size[0], 1, -1, feat_size[2])
         
         x = self.conv1(feat)
         x = self.batch_norm1(x)
@@ -68,12 +68,14 @@ class RNNEncoder(nn.Module):
         # print(x.size())
         
         x = x.permute((0,2,1,3))
-        x = x.view(feat_size[0], -1, ((feat_size[2]//2+1)//2 + 1)*32)
+        x = x.reshape(feat_size[0], -1, ((feat_size[2]//2+1)//2 + 1)*32)
 
 
         if not self.training:
             self.rnn.flatten_parameters()
 
         out, _ = self.rnn(x)
+
+        feat_len = torch.round(torch.mul(feat_len, 0.5)).to(torch.int32)
 
         return out, feat_len

@@ -27,12 +27,17 @@ def create_lambda_lr_warmup(
             if step <= warmup_step:
                 return step / warmup_step
             return 1. - (step - warmup_step) / (max_step - warmup_step)
+
+
     elif decay_type == 'poly':
         # Decays with a power of -0.5
         def lr_func(step):
-            if step <= warmup_step:
-                return step / warmup_step
-            return (warmup_step / step) ** 0.5
+            # if step <= warmup_step:
+            #     return step / warmup_step
+            # return (warmup_step / step) ** 0.5
+            max_step = 15000
+            step = min(step, max_step)
+            return ((0.001 - 0.00001) * (1 - step / max_step) ^ (0.5)) + 0.00001
     else:
         raise NotImplementedError(f'Unknown decay type {decay_type}')
 
