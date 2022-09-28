@@ -36,7 +36,7 @@ class CustomCallback(pl.Callback):
                     "val_loss": trainer.callback_metrics['val_loss'].item(),
                     "train_loss": trainer.callback_metrics['train_loss'].item()
                 },
-                "title": args.title
+                "title": self.args.title
             }
             req = requests.post("https://online-logs-viewer.herokuapp.com/objects", json=requestBody)
             logging.info(req)
