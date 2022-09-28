@@ -4,8 +4,8 @@
 
 stage=3
 stop_stage=3
-model_name=ctc_libri-10h_char_conformer_beam
-ckpt= #model/ctc_libri-10h_char/origin/epoch=101-step=8771.ckpt
+model_name=ctc_libri-10h_char_conformer_beam_spectrogram
+ckpt= #model/ctc_libri-10h_char_conformer_beam/epoch=47-step=16559.ckpt
 
 
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
