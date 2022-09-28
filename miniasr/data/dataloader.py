@@ -91,8 +91,8 @@ def create_dataloader(args, tokenizer=None):
     logging.info(f'Generating datasets and dataloaders. (mode = {args.mode})')
     if args.mode == 'train':
         # Training mode: train + dev sets
-        tr_set = ASRDataset(args.data.train_paths, tokenizer, 'train')
-        dv_set = ASRDataset(args.data.dev_paths, tokenizer, 'dev')
+        tr_set = ASRDataset(args.data.train_paths, tokenizer, 'train', max_len=args.data.max_len)
+        dv_set = ASRDataset(args.data.dev_paths, tokenizer, 'dev', max_len=args.data.max_len)
 
         tr_loader = DataLoader(
             tr_set, batch_size=args.hparam.train_batch_size,
@@ -111,7 +111,7 @@ def create_dataloader(args, tokenizer=None):
     elif args.mode in ['dev', 'wild']:
         # Dev mode: dev set only (w/ transcriptions)
         # Wild mode: w/o transcriptions
-        dv_set = ASRDataset(args.data.dev_paths, tokenizer, args.mode)
+        dv_set = ASRDataset(args.data.dev_paths, tokenizer, args.mode, max_len=args.data.max_len)
 
         dv_loader = DataLoader(
             dv_set, batch_size=args.hparam.val_batch_size,
