@@ -7,7 +7,7 @@ data:
   max_len: 1000000
 
 decode:
-  type: greedy  # beam / greedy
+  type: beam  # beam / greedy
   token: language_model/token.txt
   lm: language_model/3-gram.pruned.3e-7.bin
   lexicon: language_model/librispeech-char-lexicon.txt

@@ -1,5 +1,5 @@
 mode: train
-title: no-title
+title: conformer+beam
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -7,7 +7,7 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
-  max_len: 160
+  max_len: 1000000
 
 model:
   name: ctc_asr
@@ -34,11 +34,11 @@ model:
     time_warp_w: 80
 
 hparam:
-  train_batch_size: 32
-  val_batch_size: 32
+  train_batch_size: 8
+  val_batch_size: 8
   accum_grad: 1
   grad_clip: 5
-  njobs: 4
+  njobs: 2
   pin_memory: true
 
 checkpoint_callbacks:
@@ -55,5 +55,5 @@ trainer:
   logger: true
   log_every_n_steps: 5
   flush_logs_every_n_steps: 5
-  default_root_dir: model/ctc_libri-10h_char
+  default_root_dir: model/ctc_libri-10h_char_conformer_beam
   deterministic: true
