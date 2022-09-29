@@ -5,7 +5,7 @@
 stage=3
 stop_stage=3
 model_name=ctc_libri-10h_char-cnn-conformer-0930
-ckpt= #model/ctc_libri-10h_char/origin/epoch=101-step=8771.ckpt
+ckpt=model/ctc_libri-10h_char-cnn-conformer-0930/epoch=3-step=1379.ckpt
 
 
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
@@ -68,6 +68,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     else
         echo "Resume training from $ckpt"
         run_asr.py \
+            --config config/train.yaml \
             --ckpt $ckpt
     fi
 fi
