@@ -68,6 +68,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     else
         echo "Resume training from $ckpt"
         run_asr.py \
+            --config config/train.yaml \
             --ckpt $ckpt
     fi
 fi
