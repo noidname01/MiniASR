@@ -138,7 +138,4 @@ dmypy.json
 egs/dlhlp/model
 egs/dlhlp/data
 egs/dlhlp/language_model
-<<<<<<< HEAD
-=======
 egs/dlhlp/logs
->>>>>>> 69e559574a38bff3fb0acaba4540bbe268311beb
