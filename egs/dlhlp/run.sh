@@ -4,7 +4,7 @@
 
 stage=3
 stop_stage=3
-model_name=ctc_libri-10h_char
+model_name=ctc_libri-10h_char-cnn-conformer-0930
 ckpt= #model/ctc_libri-10h_char/origin/epoch=101-step=8771.ckpt
 
 

@@ -1,5 +1,5 @@
 mode: train
-title: no-title
+title: cnn-2+confomer-3
 data:
   train_paths: ['data/libri_train_1h/data_list_sorted.json',
                 'data/libri_train_9h/data_list_sorted.json']
@@ -7,12 +7,12 @@ data:
   text:
     mode: character
     vocab: data/libri_train_1h/vocab_char.txt
-  max_len: 160
+  max_len: 10000000
 
 model:
   name: ctc_asr
   extractor:
-    name: fbank
+    name: spectrogram
     train: false
     feature: hidden_states
   encoder:
@@ -34,8 +34,8 @@ model:
     time_warp_w: 80
 
 hparam:
-  train_batch_size: 32
-  val_batch_size: 32
+  train_batch_size: 8
+  val_batch_size: 8
   accum_grad: 1
   grad_clip: 5
   njobs: 4
@@ -49,7 +49,7 @@ checkpoint_callbacks:
 trainer:
   max_epochs: 500
   max_steps: 100000
-  check_val_every_n_epoch: 3
+  check_val_every_n_epoch: 2
   gpus: 1
   precision: 16
   logger: true
