@@ -45,16 +45,16 @@ class RNNEncoder(nn.Module):
             conv_dropout_p = dropout,
         )
 
-        # RNN model
-        self.rnn = getattr(nn, "GRU")(
-            # input_size=((in_dim//2+1)//2 + 1)//4*32,
-            input_size=in_dim,
-            hidden_size=hid_dim,
-            num_layers=n_layers,
-            dropout=dropout,
-            bidirectional=False,
-            batch_first=True
-        )
+        # # RNN model
+        # self.rnn = getattr(nn, "GRU")(
+        #     # input_size=((in_dim//2+1)//2 + 1)//4*32,
+        #     input_size=in_dim,
+        #     hidden_size=hid_dim,
+        #     num_layers=n_layers,
+        #     dropout=dropout,
+        #     bidirectional=False,
+        #     batch_first=True
+        # )
 
         # Output dimension
         # Bidirectional makes output size * 2
